@@ -13,8 +13,20 @@ namespace Zx.Controllers
     {        
         private JArray GetPdvs()
         {
-            var rawObj = JObject.Parse(System.IO.File.ReadAllText(Server.MapPath(@"~\App_Data\pdvs.json")));
-            return (JArray)rawObj["pdvs"]; 
+            const string pdvsCacheKey = "pdvs";
+            var cached = HttpRuntime.Cache.Get(pdvsCacheKey);
+            var result = new JArray();
+            if(cached != null)
+            {
+                return (JArray)cached;
+            }
+            else
+            {
+                var rawObj = JObject.Parse(System.IO.File.ReadAllText(Server.MapPath(@"~\App_Data\pdvs.json")));
+                result = (JArray)rawObj["pdvs"];
+                HttpRuntime.Cache.Insert(pdvsCacheKey, result);
+                return result;
+            } 
         }
 
         public ActionResult Get(int id)
