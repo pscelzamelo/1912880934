@@ -43,8 +43,24 @@ namespace Zx.Controllers
         }
 
         // POST: api/Pdv
-        public void Post([FromBody]string value)
+        public void Post(JObject pdv)
         {
+            var errors = new List<string>();
+            
+            //Fetch full db for validating unique document
+            var pdvs = GetPdvs();
+
+            //Validate mandatory fields
+            if ((int?)pdv["id"] < 1) errors.Add("Invalid Id");
+            if (string.IsNullOrEmpty((string)pdv["tradingName"])) errors.Add("Invalid Trading Name");
+            if (string.IsNullOrEmpty((string)pdv["ownerName"])) errors.Add("Invalid Owner Name");
+            if (string.IsNullOrEmpty((string)pdv["document"])) errors.Add("Invalid Document");
+            //coverageArea (...)
+            //address (...)
+            if ((int?)pdv["deliveryCapacity"] == null) errors.Add("Invalid Capacity");
+
+            //Validate existing CNPJ
+            if (pdvs.Any(x => (string)x["document"] == (string)pdv["document"])) errors.Add("Document must be unique within database");
         }
 
         // PUT: api/Pdv/5
