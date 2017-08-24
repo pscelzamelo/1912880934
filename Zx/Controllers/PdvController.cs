@@ -18,8 +18,8 @@ namespace Zx.Controllers
         public ActionResult Get(int id)
         {
             var pdvs = GetPdvs();
-
-            return Content("{}", "application/json");
+            var pdv = (JObject)pdvs.FirstOrDefault(x => (int)x["id"] == id);
+            return Content(pdv.ToString(), "application/json");
         }
 
 
