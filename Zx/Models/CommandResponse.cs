@@ -8,7 +8,7 @@ namespace Zx.Models
     public class CommandResponse
     {
         public bool success { get; private set; }
-        public IEnumerable<string> errors { get; private set; }
+        public List<string> errors { get; private set; }
         public object data { get; private set; }
 
         public CommandResponse(bool success, object data)
@@ -18,7 +18,7 @@ namespace Zx.Models
             this.data = data;
         }
 
-        public CommandResponse(bool success, IEnumerable<string> errors, object data)
+        public CommandResponse(bool success, List<string> errors, object data)
         {
             this.success = success;
             this.errors = errors;

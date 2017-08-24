@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web;
 using System.Web.Http;
+using Zx.Models;
 
 namespace Zx.Controllers
 {
@@ -43,12 +44,12 @@ namespace Zx.Controllers
         }
 
         // POST: api/Pdv
-        public void Post(JObject pdv)
+        public CommandResponse Post(JObject pdv)
         {
             var errors = new List<string>();
             
             //Fetch full db for validating unique document
-            var pdvs = GetPdvs();
+            //var pdvs = GetPdvs();
 
             //Validate mandatory fields
             if ((int?)pdv["id"] < 1) errors.Add("Invalid Id");
@@ -60,7 +61,9 @@ namespace Zx.Controllers
             if ((int?)pdv["deliveryCapacity"] == null) errors.Add("Invalid Capacity");
 
             //Validate existing CNPJ
-            if (pdvs.Any(x => (string)x["document"] == (string)pdv["document"])) errors.Add("Document must be unique within database");
+            //if (pdvs.Any(x => (string)x["document"] == (string)pdv["document"])) errors.Add("Document must be unique within database");
+
+            return new CommandResponse(true,pdv);
         }
 
         // PUT: api/Pdv/5
