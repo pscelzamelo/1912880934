@@ -47,12 +47,12 @@ namespace Zx.Controllers
         public CommandResponse Post(JObject pdv)
         {
             var errors = new List<string>();
-            
+
             //Fetch full db for validating unique document
-            //var pdvs = GetPdvs();
+            var pdvs = GetPdvs();
 
             //Validate mandatory fields
-            if ((int?)pdv["id"] < 1) errors.Add("Invalid Id");
+            if ((int?)pdv["id"] == null || (int?)pdv["id"] < 1) errors.Add("Invalid Id");
             if (string.IsNullOrEmpty((string)pdv["tradingName"])) errors.Add("Invalid Trading Name");
             if (string.IsNullOrEmpty((string)pdv["ownerName"])) errors.Add("Invalid Owner Name");
             if (string.IsNullOrEmpty((string)pdv["document"])) errors.Add("Invalid Document");
@@ -61,9 +61,16 @@ namespace Zx.Controllers
             if ((int?)pdv["deliveryCapacity"] == null) errors.Add("Invalid Capacity");
 
             //Validate existing CNPJ
-            //if (pdvs.Any(x => (string)x["document"] == (string)pdv["document"])) errors.Add("Document must be unique within database");
+            if (pdvs.Any(x => (string)x["document"] == (string)pdv["document"])) errors.Add("Document must be unique within database");
 
-            return new CommandResponse(true,pdv);
+            if (errors.Count > 0)
+            {
+                return new CommandResponse(false, errors, pdv);
+            }
+            else
+            {
+                return new CommandResponse(true, pdv);
+            }
         }
 
         // PUT: api/Pdv/5

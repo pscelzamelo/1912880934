@@ -3,12 +3,21 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Zx.Controllers;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using System.Web;
 
 namespace Zx.Tests
 {
     [TestClass]
     public class PdvApiTests
     {
+        [ClassInitialize()]
+        public static void ClassInit(TestContext context)
+        {
+            const string pdvsCacheKey = "pdvs";
+            var rawObj = JObject.Parse(System.IO.File.ReadAllText($@"{AppDomain.CurrentDomain.SetupInformation.ApplicationBase}\App_Data\pdvs.json"));
+            HttpRuntime.Cache.Insert(pdvsCacheKey, (JArray)rawObj["pdvs"]);
+        }
+
         private JObject MockValidPdv()
         {
             return JObject.Parse(@"{
