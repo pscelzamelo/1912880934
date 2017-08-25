@@ -54,5 +54,20 @@ namespace Zx.Tests
             Assert.IsFalse(response.success);
             Assert.IsTrue(response.errors.Count > 0);
         }
+
+        [TestMethod]
+        public void TestCreateNotUniqueCNPJ()
+        {
+            var controller = new PdvController();
+            var obj = MockValidPdv();
+            obj["document"] = "02.453.716/000170";
+
+            // Act
+            var response = controller.Post(obj);
+
+            // Assert
+            Assert.IsFalse(response.success);
+            Assert.IsTrue(response.errors.Count > 0);
+        }
     }
 }

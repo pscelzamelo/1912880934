@@ -56,6 +56,7 @@ namespace Zx.Controllers
             if (string.IsNullOrEmpty((string)pdv["tradingName"])) errors.Add("Invalid Trading Name");
             if (string.IsNullOrEmpty((string)pdv["ownerName"])) errors.Add("Invalid Owner Name");
             if (string.IsNullOrEmpty((string)pdv["document"])) errors.Add("Invalid Document");
+            
             //coverageArea (...)
             //address (...)
             if ((int?)pdv["deliveryCapacity"] == null) errors.Add("Invalid Capacity");
