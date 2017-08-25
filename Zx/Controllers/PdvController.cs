@@ -50,7 +50,7 @@ namespace Zx.Controllers
         public CommandResponse Post(JObject pdv)
         {
             var errors = new List<string>();
-            
+
             //Validate mandatory fields
             if ((int?)pdv["id"] == null || (int?)pdv["id"] < 1) errors.Add("Invalid Id");
             if (string.IsNullOrEmpty((string)pdv["tradingName"])) errors.Add("Invalid Trading Name");
@@ -79,14 +79,47 @@ namespace Zx.Controllers
             }
         }
 
-        // PUT: api/Pdv/5
-        public void Put(int id, [FromBody]string value)
+        [Route("api/pdv/closest")]
+        [HttpGet]
+        public JArray Closest()
         {
+            var req = Request.GetQueryNameValuePairs().ToDictionary(x => x.Key, x => x.Value);
+            var result = new JArray();
+
+            if (!(req.ContainsKey("lat") && req.ContainsKey("lon"))) return result; //TODO: better error handling
+            double lat, lon;
+            lat = double.Parse(req["lat"]);
+            lon = double.Parse(req["lon"]);
+
+            var testPoint = new Point(new Position(lat, lon));
+            return result;
         }
 
-        // DELETE: api/Pdv/5
-        public void Delete(int id)
+        /// <summary>
+        /// Determines if the given point is inside the polygon
+        /// </summary>
+        /// <param name="polygon">the vertices of polygon</param>
+        /// <param name="testPoint">the given point</param>
+        /// <returns>true if the point is inside the polygon; otherwise, false</returns>
+        public static bool IsPointInPolygon(Point[] polygon, Point testPoint)
         {
+            bool result = false;
+            int j = polygon.Count() - 1;
+            for (int i = 0; i < polygon.Count(); i++)
+            {
+                if (polygon[i].Coordinates.Latitude < testPoint.Coordinates.Latitude && polygon[j].Coordinates.Latitude >= testPoint.Coordinates.Latitude
+                    || polygon[j].Coordinates.Latitude < testPoint.Coordinates.Latitude && polygon[i].Coordinates.Latitude >= testPoint.Coordinates.Latitude)
+                {
+                    if (polygon[i].Coordinates.Longitude + (testPoint.Coordinates.Latitude - polygon[i].Coordinates.Latitude)
+                        / (polygon[j].Coordinates.Latitude - polygon[i].Coordinates.Latitude) *
+                            (polygon[j].Coordinates.Longitude - polygon[i].Coordinates.Longitude) < testPoint.Coordinates.Longitude)
+                    {
+                        result = !result;
+                    }
+                }
+                j = i;
+            }
+            return result;
         }
     }
 }
