@@ -43,6 +43,7 @@ namespace Zx.Tests
         [TestMethod]
         public void TestCreateInvalidId()
         {
+            //Arrange
             var controller = new PdvController();
             var obj = MockValidPdv();
             obj["id"] = null;
@@ -58,6 +59,7 @@ namespace Zx.Tests
         [TestMethod]
         public void TestCreateNotUniqueCNPJ()
         {
+            //Arrange
             var controller = new PdvController();
             var obj = MockValidPdv();
             obj["document"] = "02.453.716/000170";
@@ -73,6 +75,7 @@ namespace Zx.Tests
         [TestMethod]
         public void TestCreateEmptyAddress()
         {
+            //Arrange
             var controller = new PdvController();
             var obj = MockValidPdv();
             obj["address"] = null;

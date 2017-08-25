@@ -9,6 +9,7 @@ using System.Net.Http;
 using System.Web;
 using System.Web.Http;
 using Zx.Models;
+using Zx.Utils;
 
 namespace Zx.Controllers
 {
@@ -81,45 +82,37 @@ namespace Zx.Controllers
 
         [Route("api/pdv/closest")]
         [HttpGet]
-        public JArray Closest()
+        public JObject Closest()
         {
             var req = Request.GetQueryNameValuePairs().ToDictionary(x => x.Key, x => x.Value);
-            var result = new JArray();
+            JObject result = null;
 
+            //Read data from querystring
             if (!(req.ContainsKey("lat") && req.ContainsKey("lon"))) return result; //TODO: better error handling
             double lat, lon;
             lat = double.Parse(req["lat"]);
             lon = double.Parse(req["lon"]);
-
             var testPoint = new Point(new Position(lat, lon));
-            return result;
-        }
 
-        /// <summary>
-        /// Determines if the given point is inside the polygon
-        /// </summary>
-        /// <param name="polygon">the vertices of polygon</param>
-        /// <param name="testPoint">the given point</param>
-        /// <returns>true if the point is inside the polygon; otherwise, false</returns>
-        public static bool IsPointInPolygon(Point[] polygon, Point testPoint)
-        {
-            bool result = false;
-            int j = polygon.Count() - 1;
-            for (int i = 0; i < polygon.Count(); i++)
+            //Query PDV's to find the closest
+            var pdvs = GetPdvs();
+            foreach (JObject pdv in pdvs)
             {
-                if (polygon[i].Coordinates.Latitude < testPoint.Coordinates.Latitude && polygon[j].Coordinates.Latitude >= testPoint.Coordinates.Latitude
-                    || polygon[j].Coordinates.Latitude < testPoint.Coordinates.Latitude && polygon[i].Coordinates.Latitude >= testPoint.Coordinates.Latitude)
+                var address = JsonConvert.DeserializeObject<Point>(pdv["address"]?.ToString());
+                var distance = GeoUtils.GetDistance(address, testPoint);
+                if(result == null || (double)result["distance"] > distance)
                 {
-                    if (polygon[i].Coordinates.Longitude + (testPoint.Coordinates.Latitude - polygon[i].Coordinates.Latitude)
-                        / (polygon[j].Coordinates.Latitude - polygon[i].Coordinates.Latitude) *
-                            (polygon[j].Coordinates.Longitude - polygon[i].Coordinates.Longitude) < testPoint.Coordinates.Longitude)
+                    var coverageArea = JsonConvert.DeserializeObject<MultiPolygon>(pdv["coverageArea"]?.ToString());
+                    if (GeoUtils.IsPointInMultiPolygon(testPoint, coverageArea))
                     {
-                        result = !result;
+                        pdv["distance"] = distance;
+                        result = pdv;
                     }
                 }
-                j = i;
             }
+
             return result;
         }
+
     }
 }
