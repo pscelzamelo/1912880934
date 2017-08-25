@@ -69,5 +69,20 @@ namespace Zx.Tests
             Assert.IsFalse(response.success);
             Assert.IsTrue(response.errors.Count > 0);
         }
+
+        [TestMethod]
+        public void TestCreateEmptyAddress()
+        {
+            var controller = new PdvController();
+            var obj = MockValidPdv();
+            obj["address"] = null;
+
+            // Act
+            var response = controller.Post(obj);
+
+            // Assert
+            Assert.IsFalse(response.success);
+            Assert.IsTrue(response.errors.Count > 0);
+        }
     }
 }

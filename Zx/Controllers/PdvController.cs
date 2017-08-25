@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using GeoJSON.Net.Geometry;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -56,10 +58,11 @@ namespace Zx.Controllers
             if (string.IsNullOrEmpty((string)pdv["tradingName"])) errors.Add("Invalid Trading Name");
             if (string.IsNullOrEmpty((string)pdv["ownerName"])) errors.Add("Invalid Owner Name");
             if (string.IsNullOrEmpty((string)pdv["document"])) errors.Add("Invalid Document");
-            
-            //coverageArea (...)
-            //address (...)
             if ((int?)pdv["deliveryCapacity"] == null) errors.Add("Invalid Capacity");
+            var coverageArea = JsonConvert.DeserializeObject<MultiPolygon>(pdv["coverageArea"]?.ToString());
+            if(coverageArea == null) errors.Add("Invalid Coverage Area");
+            var address = JsonConvert.DeserializeObject<Point>(pdv["address"]?.ToString());
+            if (address == null) errors.Add("Invalid Address");
 
             //Validate existing CNPJ
             if (pdvs.Any(x => (string)x["document"] == (string)pdv["document"])) errors.Add("Document must be unique within database");
