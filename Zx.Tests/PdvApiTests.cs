@@ -41,7 +41,7 @@ namespace Zx.Tests
         }
 
         [TestMethod]
-        public void TestCreateInvalidId()
+        public void TestCreatePdvInvalidId()
         {
             //Arrange
             var controller = new PdvController();
@@ -57,7 +57,7 @@ namespace Zx.Tests
         }
 
         [TestMethod]
-        public void TestCreateNotUniqueCNPJ()
+        public void TestCreatePdvNotUniqueCNPJ()
         {
             //Arrange
             var controller = new PdvController();
@@ -73,7 +73,7 @@ namespace Zx.Tests
         }
 
         [TestMethod]
-        public void TestCreateEmptyAddress()
+        public void TestCreatePdvEmptyAddress()
         {
             //Arrange
             var controller = new PdvController();
@@ -86,6 +86,22 @@ namespace Zx.Tests
             // Assert
             Assert.IsFalse(response.success);
             Assert.IsTrue(response.errors.Count > 0);
+        }
+
+
+        [TestMethod]
+        public void TestCreatePdvSuccess()
+        {
+            //Arrange
+            var controller = new PdvController();
+            var obj = MockValidPdv();
+
+            // Act
+            var response = controller.Post(obj);
+
+            // Assert
+            Assert.IsTrue(response.success);
+            Assert.IsTrue(response.errors.Count == 0);
         }
     }
 }
